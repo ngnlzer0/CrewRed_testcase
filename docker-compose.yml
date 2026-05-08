@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/code
+    environment:
+      - DATABASE_URL=sqlite:///./travel_planner.db
+    restart: always
