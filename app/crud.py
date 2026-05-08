@@ -54,7 +54,7 @@ def delete_project(db: Session, db_project: models.Project) -> bool:
     project cannot be deleted if any of its places are already marked as visited.
     Returns False if deletion is prohibited.
     """
-    for place in db_project.palces:
+    for place in db_project.places:
         if place.is_visited:
             return False
 
@@ -64,8 +64,8 @@ def delete_project(db: Session, db_project: models.Project) -> bool:
 
 
 # Operation for Place
-def get_palce(db: Session, place_id: int):
-    return db.query(models.Palce).filter(models.Place.id == place_id).first()
+def get_place(db: Session, place_id: int):
+    return db.query(models.Place).filter(models.Place.id == place_id).first()
 
 def add_place_to_project(db: Session, place: schemas.PlaceCreate, project_id: int):
     db_place = models.Place(
@@ -84,7 +84,7 @@ def check_and_complete_project(db: Session, project_id: int):
         the project is marked as completed.
     """
     project = get_project(db, project_id)
-    if not project or not project.palce:
+    if not project or not project.places:
         return
 
     all_visited = all(place.is_visited for place in project.places)

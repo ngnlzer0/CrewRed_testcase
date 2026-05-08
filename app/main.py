@@ -24,7 +24,7 @@ async def create_project(project: schemas.ProjectCreate, db: Session = Depends(g
 
     return crud.create_project(db=db, project=project)
 
-@app.get("/projects/", response_model= schemas.ProjectResponse)
+@app.get("/projects/", response_model=List[schemas.ProjectResponse])
 def read_projects(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return crud.get_projects(db,skip=skip, limit=limit)
 
@@ -97,3 +97,10 @@ def get_place(place_id: int, db: Session = Depends(get_db)):
     if db_place is None:
         raise HTTPException(status_code=404, detail="place not found")
     return db_place
+
+@app.get("/projects/{project_id}/places/", response_model=List[schemas.PlaceResponse])
+def list_project_places(project_id: int, db: Session = Depends(get_db)):
+    db_project = crud.get_project(db, project_id=project_id)
+    if db_project is None:
+        raise HTTPException(status_code=404, detail="project not found")
+    return db_project.places

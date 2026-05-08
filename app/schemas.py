@@ -12,14 +12,14 @@ from app.models import Place
 class PlaceBase(BaseModel):
     notes: Optional[str] = None
 
-class PlaceCreate(BaseModel):
-    external_id: int = Field(... , discription="ID place from Art Institute API")
+class PlaceCreate(PlaceBase):
+    external_id: int = Field(... , description="ID place from Art Institute API")
 
 class PlaceUpdate(BaseModel):
     notes: Optional[str] = None
     is_visited: Optional[bool] = None
 
-class PlaceResponse(BaseModel):
+class PlaceResponse(PlaceBase):
     id: int
     external_id: int
     project_id: int
@@ -48,7 +48,7 @@ class ProjectCreate(ProjectBase):
 
 class ProjectUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=150)
-    descrition: Optional[str] = None
+    description: Optional[str] = None
     start_date: Optional[date] = None
 
 class ProjectResponse(ProjectBase):
