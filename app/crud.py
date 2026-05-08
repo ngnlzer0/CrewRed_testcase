@@ -64,4 +64,51 @@ def delete_project(db: Session, db_project: models.Project) -> bool:
 
 
 # Operation for Place
+def get_palce(db: Session, place_id: int):
+    return db.query(models.Palce).filter(models.Place.id == place_id).first()
+
+def add_place_to_project(db: Session, place: schemas.PlaceCreate, project_id: int):
+    db_place = models.Place(
+        external_id = place.external_id,
+        notes=place.notes,
+        project_id = project_id
+    )
+    db.add(db_place)
+    db.commit()
+    db.refresh(db_place)
+    return db_place
+
+def check_and_complete_project(db: Session, project_id: int):
+    """
+        When all places in a project are marked as visited,
+        the project is marked as completed.
+    """
+    project = get_project(db, project_id)
+    if not project or not project.palce:
+        return
+
+    all_visited = all(place.is_visited for place in project.places)
+
+    if all_visited and not project.is_completed:
+        project.is_completed = True
+        db.commit()
+    elif not all_visited and project.is_completed:
+        project.is_completed = False
+        db.commit()
+
+def update_place(db: Session, db_place: models.Place, place_update: schemas.PlaceUpdate):
+    update_data = place_update.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_place, key, value)
+
+    db.commit()
+    db.refresh(db_place)
+
+    # If the is_visited status is updated, we check if the entire project has completed.
+    if "is_visited" in update_data:
+        check_and_complete_project(db, db_place.project_id)
+        # Update the place object again to catch any changes to the project
+        db.refresh(db_place)
+
+    return db_place
 
